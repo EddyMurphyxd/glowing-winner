@@ -1,0 +1,39 @@
+.reservations-section {
+  &__title {
+    color: lightblue;
+    padding-left: 10px;
+  }
+
+  &__layout {
+    background-color: lightgray;
+    padding: 10px;
+  }
+
+  &__layout-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    align-items: center;
+  }
+
+  &__button {
+    background-color: mediumblue;
+    padding: 12px 10px;
+    color: #fff;
+    box-shadow: none;
+    border: none;
+    position: relative;
+    padding-left: 40px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  &__add-icon {
+    font-size: 2rem;
+    font-weight: bold;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
