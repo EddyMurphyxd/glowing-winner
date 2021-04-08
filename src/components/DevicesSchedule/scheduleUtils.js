@@ -2,21 +2,21 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import utc from 'dayjs/plugin/utc';
 
-dayjs.extend(utc)
+dayjs.extend(utc);
 dayjs.extend(isBetween);
 
-export const getHoursPerDay = () => [...Array(24).keys()].map(hour => dayjs.utc().hour(hour).minute(0).second(0));
+export const hoursPerDay = [...Array(24).keys()].map(hour => dayjs.utc().hour(hour).minute(0).second(0));
 
 export const convertToHoursMinutes = isoTime => dayjs(isoTime).format('HH:mm');
 
-export const getTimestamps = (hoursPerDay) => {
+export const getTimestamps = () => {
   return hoursPerDay.map((isoTime) => ({
-    from: isoTime.format(),
-    to: isoTime.add(1, 'h').format(),
+    from: isoTime.format('YYYY-MM-DDTHH:mm:ss'),
+    to: isoTime.add(1, 'h').format('YYYY-MM-DDTHH:mm:ss'),
   }))
 }
 
-export const isReservationInTimestamp = (reservation, { from, to }) => dayjs(reservation.from).isBetween(from, to, 'minute', '[)');
+export const isReservationInTimestamp = (reservation, { from, to }) => dayjs.utc(reservation.from).isBetween(from, to, 'minute', '[)');
 export const getReservationPosition = (reservation, slot) => {
   const startDiff = dayjs(reservation.from).diff(slot.from, 'minutes');
 

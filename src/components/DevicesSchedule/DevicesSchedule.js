@@ -4,25 +4,24 @@ import PropTypes from 'prop-types';
 import './DevicesSchedule.scss';
 import * as scheduleUtils from './scheduleUtils';
 
-const extractReservations = (devices) => {
+const timeStampSlots = scheduleUtils.getTimestamps();
+
+const extractReservations = devices => {
   return devices.reduce((accum, device) => ({
     ...accum,
     [device.id]: device.reservations
   }), {});
 };
 
-const hoursPerDay = scheduleUtils.getHoursPerDay();
-const timeStampSlots = scheduleUtils.getTimestamps(hoursPerDay);
-
 function DevicesSchedule({ devices, readonly = false, onTimeSlotClicked }) {
   const reservationsDictionary = extractReservations(devices);
 
-  const handleSlotClick = (event, slot) => {
+  const handleSlotClick = (event, deviceId, timestamp) => {
     if (readonly || event.target.classList.contains('devices-schedule__event')) {
       return;
     }
 
-    onTimeSlotClicked(slot);
+    onTimeSlotClicked({ deviceId, ...timestamp });
   }
 
   const getSlotsByDevice = (deviceId, deviceReservations) => {
@@ -38,11 +37,15 @@ function DevicesSchedule({ devices, readonly = false, onTimeSlotClicked }) {
     )
   };
 
-  const getSlot = (deviceId, deviceReservations, { from, to }) => (
-    <div className="devices-schedule__time-slot" key={`timeslot-${deviceId}-${from}-${to}`} onClick={(event) => handleSlotClick(event, from)}>
-      { getReservation(deviceReservations, { from, to }) }
-    </div>
-  )
+  const getSlot = (deviceId, deviceReservations, timestamp) => {
+    return (
+      <div className="devices-schedule__time-slot" id={getSlotId(deviceId, timestamp)} key={`timeslot-${deviceId}-${timestamp.from}`} onClick={(event) => handleSlotClick(event, deviceId, timestamp)}>
+        { getReservation(deviceReservations, timestamp) }
+      </div>
+    )
+  };
+
+  const getSlotId = (deviceId, { from, to }) => readonly ? '' : `device-timeslot-${deviceId}-${from}-${to}`;
 
   const getReservation = (deviceReservations, timestamp) => {
     const appropriateReservation = deviceReservations.find((reservation) => scheduleUtils.isReservationInTimestamp(reservation, timestamp));
@@ -74,7 +77,7 @@ function DevicesSchedule({ devices, readonly = false, onTimeSlotClicked }) {
       <div className="devices-schedule__time-column">
         <div className="devices-schedule__scrollable">
           <div className="devices-schedule__heading devices-schedule__time-heading">
-            {hoursPerDay.map(hour => getHeading(hour))}
+            {scheduleUtils.hoursPerDay.map(hour => getHeading(hour))}
           </div>
 
           {

@@ -1,23 +1,35 @@
-import { TimePicker } from "@material-ui/pickers";
-import { useState } from "react"
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DayJsUtils from '@date-io/dayjs';
+import { useState } from "react";
+import dayjs from "dayjs";
 
-import DevicesSchedule from "../DevicesSchedule/DevicesSchedule"
+import DevicesSchedule from "../DevicesSchedule/DevicesSchedule";
+import ReservedSlot from "../DevicesSchedule/ReservedSlot";
+import { TextField } from "@material-ui/core";
+
+import { convertToHoursMinutes } from '../DevicesSchedule/scheduleUtils';
 
 function AddReservation({ devices = [], onReservationAdded, onClose }) {
   const [reservation, setReservation] = useState(null);
-  const [selectedFromDate, handleFromDateChange] = useState(new Date());
-  const [selectedToDate, handleToDateChange] = useState(new Date());
 
-  const handleSlotClick = (slot) => {
-    setReservation({
-      deviceId: '1',
-    });
+  const handleSlotClick = (reservation) => {
+    setReservation(reservation);
   }
 
   const handleAddClick = () => {
     onReservationAdded(reservation);
+  }
+
+  const handleFromDateChange = (from) => {
+    setReservation({
+      ...reservation,
+      from: dayjs.utc().hour(from.split(':')[0]).minute(from.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss')
+    })
+  }
+
+  const handleToDateChange = (to) => {
+    setReservation({
+      ...reservation,
+      to: dayjs.utc().hour(to.split(':')[0]).minute(to.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss')
+    })
   }
 
   return (
@@ -35,12 +47,31 @@ function AddReservation({ devices = [], onReservationAdded, onClose }) {
       <DevicesSchedule devices={devices} onTimeSlotClicked={(slot) => handleSlotClick(slot)} />
 
       {reservation && <div className="add-reservation__select-time">
-        <p>from: {reservation.from}</p>
-        <MuiPickersUtilsProvider utils={DayJsUtils}>
-          <TimePicker value={selectedFromDate} onChange={handleFromDateChange} />
-          <p>to: {reservation.to}</p> 
-          <TimePicker value={selectedToDate} onChange={handleToDateChange} />
-        </MuiPickersUtilsProvider>
+        <ReservedSlot reservation={reservation} />
+        <TextField
+          label="From"
+          type="time"
+          value={convertToHoursMinutes(reservation.from)}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          inputProps={{
+            step: 1800, // 30 min
+          }}
+          onChange={(event) => handleFromDateChange(event.target.value)}
+        />
+        <TextField
+          label="To"
+          type="time"
+          value={convertToHoursMinutes(reservation.to)}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          inputProps={{
+            step: 1800, // 30 min
+          }}
+          onChange={(event) => handleToDateChange(event.target.value)}
+        />
         <p>deviceId: {reservation.deviceId}</p>
       </div>}
 
