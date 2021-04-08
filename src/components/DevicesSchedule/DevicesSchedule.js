@@ -1,6 +1,8 @@
+
 import PropTypes from 'prop-types';
 
 import './DevicesSchedule.scss';
+import * as scheduleUtils from './scheduleUtils';
 
 const extractReservations = (devices) => {
   return devices.reduce((accum, device) => ({
@@ -9,8 +11,11 @@ const extractReservations = (devices) => {
   }), {});
 };
 
+const hoursPerDay = scheduleUtils.getHoursPerDay();
+const timeStampSlots = scheduleUtils.getTimestamps(hoursPerDay);
+
 function DevicesSchedule({ devices, readonly = false, onTimeSlotClicked }) {
-  const reservations = extractReservations(devices);
+  const reservationsDictionary = extractReservations(devices);
 
   const handleSlotClick = (event, slot) => {
     if (readonly || event.target.classList.contains('devices-schedule__event')) {
@@ -20,47 +25,65 @@ function DevicesSchedule({ devices, readonly = false, onTimeSlotClicked }) {
     onTimeSlotClicked(slot);
   }
 
-  const timelineHeadings = [...Array(24).keys()].map((el, index) => (
-    <div className="devices-schedule__time-heading-item" key={`heading-${index}`}>
-      <span className="devices-schedule__time-heading-label">{index < 10 ? `0${index}` : index}:00</span>
-    </div>
-  ));
+  const getSlotsByDevice = (deviceId, deviceReservations) => {
+    return timeStampSlots.map(timestamp => getSlot(deviceId, deviceReservations, timestamp));
+  }
 
-  const timelineSlots = [...Array(24).keys()].map((el, index) => (
-    <div className="devices-schedule__time-slot" key={`timeslot-${index}`} onClick={(event) => handleSlotClick(event, index)}>
-      { index % 2 === 0 && <div className="devices-schedule__event"></div> }
+  const getHeading = (isoTime) => {
+    const hoursMinutes = scheduleUtils.convertToHoursMinutes(isoTime);
+    return (
+      <div className="devices-schedule__time-heading-item" key={`heading-${hoursMinutes}`}>
+        <span className="devices-schedule__time-heading-label">{hoursMinutes}</span>
+      </div>
+    )
+  };
+
+  const getSlot = (deviceId, deviceReservations, { from, to }) => (
+    <div className="devices-schedule__time-slot" key={`timeslot-${deviceId}-${from}-${to}`} onClick={(event) => handleSlotClick(event, from)}>
+      { getReservation(deviceReservations, { from, to }) }
     </div>
-  ));
+  )
+
+  const getReservation = (deviceReservations, timestamp) => {
+    const appropriateReservation = deviceReservations.find((reservation) => scheduleUtils.isReservationInTimestamp(reservation, timestamp));
+    if (!appropriateReservation) {
+      return null;
+    }
+
+    const slotPosition = scheduleUtils.getReservationPosition(appropriateReservation, timestamp);
+    const slotWidth = scheduleUtils.getReservationWidth(appropriateReservation);
+
+    return <div className="devices-schedule__event" style={{ left: slotPosition, width: slotWidth }}></div>
+  }
   
   return (
     <div className="devices-schedule">
       <div className="devices-schedule__devices-column">
         <div className="devices-schedule__heading devices-schedule__device-heading">Device / Time</div>
 
-        <div className="devices-schedule__device-row">
-          <strong>Htc One M8</strong>
-          <p>HT59W</p>
-        </div>
-
-        <div className="devices-schedule__device-row">
-          <strong>Motorola MOto X</strong>
-          <p>HT59W</p>
-        </div>
+        {
+          devices.map((device, index) => (
+            <div className="devices-schedule__device-row" key={`${device.name}-${index}`}>
+              <strong>{device.name}</strong>
+              <p>{device.firmware}</p>
+            </div>
+          ))
+        }
       </div>
 
       <div className="devices-schedule__time-column">
         <div className="devices-schedule__scrollable">
           <div className="devices-schedule__heading devices-schedule__time-heading">
-            {timelineHeadings}
+            {hoursPerDay.map(hour => getHeading(hour))}
           </div>
 
-          <div className="devices-schedule__timeline">
-            {timelineSlots}
-          </div>
-
-          <div className="devices-schedule__timeline">
-            {timelineSlots}
-          </div>
+          {
+            devices.map(device => (
+              <div className="devices-schedule__timeline" key={`timeline-${device.id}`}>
+                {getSlotsByDevice(device.id, reservationsDictionary[device.id])}
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>
