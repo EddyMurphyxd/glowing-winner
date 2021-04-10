@@ -9,7 +9,7 @@ import AddReservation from './AddReservation';
 
 import './Reservations.scss';
 
-function Reservations({ devices = [], onReservationAdded }) {
+function Reservations({ devices, reservations, onReservationAdded }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddReservation = (reservation) => {
@@ -39,19 +39,20 @@ function Reservations({ devices = [], onReservationAdded }) {
             }}
           >
             <Fade in={isModalOpen}>
-              <AddReservation devices={devices} onReservationAdded={handleAddReservation} onClose={() => setIsModalOpen(false)}/>
+              <AddReservation devices={devices} reservations={reservations} onReservationAdded={handleAddReservation} onClose={() => setIsModalOpen(false)}/>
             </Fade>
           </Modal>
         </div>
     
-        <DevicesSchedule devices={devices} readonly />
+        <DevicesSchedule devices={devices} reservations={reservations} readonly />
       </div>
     </section>
   )
 }
 
 Reservations.propTypes = {
-  devices: PropTypes.array.isRequired
+  devices: PropTypes.array.isRequired,
+  reservations: PropTypes.object.isRequired,
 }
 
 export default Reservations;

@@ -12,7 +12,7 @@ import { convertToHoursMinutes } from '../DevicesSchedule/scheduleUtils';
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
-function AddReservation({ devices = [], onReservationAdded, onClose }) {
+function AddReservation({ devices, reservations, onReservationAdded, onClose }) {
   const [reservation, setReservation] = useState(null);
 
   const handleSlotClick = (reservation) => {
@@ -55,7 +55,7 @@ function AddReservation({ devices = [], onReservationAdded, onClose }) {
     }}>
       <h2>Click on a time slot to select the wanted reservation</h2>
 
-      <DevicesSchedule devices={devices} onTimeSlotClicked={(slot) => handleSlotClick(slot)} />
+      <DevicesSchedule devices={devices} reservations={reservations} onTimeSlotClicked={(slot) => handleSlotClick(slot)} />
 
       {reservation && <div className="add-reservation__select-time">
         <ReservedSlot reservation={reservation} />

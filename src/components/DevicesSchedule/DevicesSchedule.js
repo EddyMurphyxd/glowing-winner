@@ -7,18 +7,7 @@ import * as scheduleUtils from './scheduleUtils';
 
 const timeStampSlots = scheduleUtils.getTimestamps();
 
-const extractReservations = devices => {
-  return devices.reduce((accum, device) => ({
-    ...accum,
-    [device.id]: device.reservations.map(({ from, to }) => ({
-      from: dayjs.utc(from).format('YYYY-MM-DDTHH:mm:ss'),
-      to: dayjs.utc(to).format('YYYY-MM-DDTHH:mm:ss')
-    }))
-  }), {});
-};
-
-function DevicesSchedule({ devices, readonly = false, onTimeSlotClicked }) {
-  const reservationsDictionary = extractReservations(devices);
+function DevicesSchedule({ devices, reservations, readonly = false, onTimeSlotClicked }) {
 
   const handleSlotClick = (event, deviceId, timestamp) => {
     if (readonly || event.target.classList.contains('devices-schedule__event')) {
@@ -87,7 +76,7 @@ function DevicesSchedule({ devices, readonly = false, onTimeSlotClicked }) {
           {
             devices.map(device => (
               <div className="devices-schedule__timeline" key={`timeline-${device.id}`}>
-                {getSlotsByDevice(device.id, reservationsDictionary[device.id])}
+                {getSlotsByDevice(device.id, reservations[device.id])}
               </div>
             ))
           }

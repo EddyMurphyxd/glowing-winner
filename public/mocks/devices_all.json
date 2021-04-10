@@ -2,35 +2,11 @@
   {
     "id": 1,
     "name": "Xiaomi xx",
-    "firmware": "TaK187HG",
-    "reservations": [
-      {
-        "deviceId": "1",
-        "from": "2021-04-10T16:20:00+00:00",
-        "to": "2021-04-10T16:40:00+00:00"
-      },
-      {
-        "deviceId": "1",
-        "from": "2021-04-10T19:30:00+00:00",
-        "to": "2021-04-10T23:45:00+00:00"
-      }
-    ]
+    "firmware": "TaK187HG"
   },
   {
     "id": 2,
     "name": "HTC One M8",
-    "firmware": "HT5123LMKsx9",
-    "reservations": [
-      {
-        "deviceId": "2",
-        "from": "2021-04-10T03:24:00+00:00",
-        "to": "2021-04-10T04:20:00+00:00"
-      },
-      {
-        "deviceId": "2",
-        "from": "2021-04-10T10:00:00+00:00",
-        "to": "2021-04-10T11:00:00+00:00"
-      }
-    ]
+    "firmware": "HT5123LMKsx9"
   }
 ]
