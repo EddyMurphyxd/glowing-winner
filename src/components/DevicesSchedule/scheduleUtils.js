@@ -5,14 +5,16 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 dayjs.extend(isBetween);
 
+export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+
 export const hoursPerDay = [...Array(24).keys()].map(hour => dayjs.utc().hour(hour).minute(0).second(0));
 
 export const convertToHoursMinutes = isoTime => dayjs(isoTime).format('HH:mm');
 
 export const getTimestamps = () => {
   return hoursPerDay.map((isoTime) => ({
-    from: isoTime.format('YYYY-MM-DDTHH:mm:ss'),
-    to: isoTime.add(1, 'h').format('YYYY-MM-DDTHH:mm:ss'),
+    from: isoTime.format(DATE_FORMAT),
+    to: isoTime.add(1, 'h').format(DATE_FORMAT),
   }))
 }
 

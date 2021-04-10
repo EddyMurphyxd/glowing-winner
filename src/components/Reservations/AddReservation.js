@@ -7,7 +7,7 @@ import DevicesSchedule from "../DevicesSchedule/DevicesSchedule";
 import ReservedSlot from "../DevicesSchedule/ReservedSlot";
 import { TextField } from "@material-ui/core";
 
-import { convertToHoursMinutes } from '../DevicesSchedule/scheduleUtils';
+import { convertToHoursMinutes, DATE_FORMAT } from '../DevicesSchedule/scheduleUtils';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -24,7 +24,7 @@ function AddReservation({ devices, reservations, onReservationAdded, onClose }) 
   }
 
   const handleFromDateChange = (from) => {
-    const convertedFrom = dayjs.utc().hour(from.split(':')[0]).minute(from.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss');
+    const convertedFrom = dayjs.utc().hour(from.split(':')[0]).minute(from.split(':')[1]).second(0).format(DATE_FORMAT);
     const to = dayjs(convertedFrom).isSameOrAfter(reservation.to) ? dayjs(convertedFrom).add(1, 'h') : reservation.to;
     setReservation({
       ...reservation,
@@ -34,7 +34,7 @@ function AddReservation({ devices, reservations, onReservationAdded, onClose }) 
   }
 
   const handleToDateChange = (to) => {
-    const convertedTo = dayjs.utc().hour(to.split(':')[0]).minute(to.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss');
+    const convertedTo = dayjs.utc().hour(to.split(':')[0]).minute(to.split(':')[1]).second(0).format(DATE_FORMAT);
     const from = dayjs(convertedTo).isSameOrBefore(reservation.from) ? dayjs(convertedTo).subtract(1, 'h') : reservation.from;
     setReservation({
       ...reservation,
