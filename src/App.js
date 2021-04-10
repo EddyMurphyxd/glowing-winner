@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
 
 import Reservations from "./components/Reservations/Reservations";
 
