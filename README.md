@@ -15,6 +15,8 @@ You can also add / remove the reservations respectfully to the data structure:
 }
 ```
 
+The `deviceId` is being set as per devices list which is located in: `public/mocks/devices_all.json`.
+
 # 2. Run app
 
 ### `yarn start`
