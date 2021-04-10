@@ -1,4 +1,5 @@
 
+import dayjs from 'dayjs';
 import PropTypes from 'prop-types';
 
 import './DevicesSchedule.scss';
@@ -9,7 +10,10 @@ const timeStampSlots = scheduleUtils.getTimestamps();
 const extractReservations = devices => {
   return devices.reduce((accum, device) => ({
     ...accum,
-    [device.id]: device.reservations
+    [device.id]: device.reservations.map(({ from, to }) => ({
+      from: dayjs.utc(from).format('YYYY-MM-DDTHH:mm:ss'),
+      to: dayjs.utc(to).format('YYYY-MM-DDTHH:mm:ss')
+    }))
   }), {});
 };
 

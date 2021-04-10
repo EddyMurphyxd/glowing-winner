@@ -10,7 +10,7 @@ function ReservedSlot({ reservation }) {
   const slotWidth = scheduleUtils.getReservationWidth(reservation);
 
   return ReactDOM.createPortal(
-    <div className="devices-schedule__event" style={{ left: slotPosition, width: slotWidth }}></div>,
+    <div className="devices-schedule__event" style={{ left: slotPosition, width: slotWidth, backgroundColor: "violet" }}></div>,
     slotEl,
   );
 }

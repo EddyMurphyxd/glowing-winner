@@ -16,7 +16,7 @@ export const getTimestamps = () => {
   }))
 }
 
-export const isReservationInTimestamp = (reservation, { from, to }) => dayjs.utc(reservation.from).isBetween(from, to, 'minute', '[)');
+export const isReservationInTimestamp = (reservation, { from, to }) => dayjs.utc(reservation.from).isBetween(dayjs.utc(from), dayjs.utc(to), 'minute', '[)');
 export const getReservationPosition = (reservation, slot) => {
   const startDiff = dayjs(reservation.from).diff(slot.from, 'minutes');
 

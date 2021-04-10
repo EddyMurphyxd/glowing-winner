@@ -1,11 +1,16 @@
 import { useState } from "react";
 import dayjs from "dayjs";
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 import DevicesSchedule from "../DevicesSchedule/DevicesSchedule";
 import ReservedSlot from "../DevicesSchedule/ReservedSlot";
 import { TextField } from "@material-ui/core";
 
 import { convertToHoursMinutes } from '../DevicesSchedule/scheduleUtils';
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 function AddReservation({ devices = [], onReservationAdded, onClose }) {
   const [reservation, setReservation] = useState(null);
@@ -19,16 +24,22 @@ function AddReservation({ devices = [], onReservationAdded, onClose }) {
   }
 
   const handleFromDateChange = (from) => {
+    const convertedFrom = dayjs.utc().hour(from.split(':')[0]).minute(from.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss');
+    const to = dayjs(convertedFrom).isSameOrAfter(reservation.to) ? dayjs(convertedFrom).add(1, 'h') : reservation.to;
     setReservation({
       ...reservation,
-      from: dayjs.utc().hour(from.split(':')[0]).minute(from.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss')
+      from: convertedFrom,
+      to,
     })
   }
 
   const handleToDateChange = (to) => {
+    const convertedTo = dayjs.utc().hour(to.split(':')[0]).minute(to.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss');
+    const from = dayjs(convertedTo).isSameOrBefore(reservation.from) ? dayjs(convertedTo).subtract(1, 'h') : reservation.from;
     setReservation({
       ...reservation,
-      to: dayjs.utc().hour(to.split(':')[0]).minute(to.split(':')[1]).second(0).format('YYYY-MM-DDTHH:mm:ss')
+      to: convertedTo,
+      from,
     })
   }
 
@@ -48,35 +59,40 @@ function AddReservation({ devices = [], onReservationAdded, onClose }) {
 
       {reservation && <div className="add-reservation__select-time">
         <ReservedSlot reservation={reservation} />
-        <TextField
-          label="From"
-          type="time"
-          value={convertToHoursMinutes(reservation.from)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputProps={{
-            step: 1800, // 30 min
-          }}
-          onChange={(event) => handleFromDateChange(event.target.value)}
-        />
-        <TextField
-          label="To"
-          type="time"
-          value={convertToHoursMinutes(reservation.to)}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          inputProps={{
-            step: 1800, // 30 min
-          }}
-          onChange={(event) => handleToDateChange(event.target.value)}
-        />
-        <p>deviceId: {reservation.deviceId}</p>
+        
+        <div style={{ padding: '20px 0' }}>
+          <TextField
+            label="From"
+            type="time"
+            value={convertToHoursMinutes(reservation.from)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              step: 1800, // 30 min
+            }}
+            onChange={(event) => handleFromDateChange(event.target.value)}
+            style={{ marginRight: '15px' }}
+          />
+          <TextField
+            label="To"
+            type="time"
+            value={convertToHoursMinutes(reservation.to)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              step: 1800, // 30 min
+            }}
+            onChange={(event) => handleToDateChange(event.target.value)}
+          />
+        </div>
       </div>}
 
-      <button onClick={onClose}>Close</button>
-      <button disabled={!reservation} onClick={() => handleAddClick()}>Add</button>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <button onClick={onClose}>Close</button>
+        <button disabled={!reservation} onClick={() => handleAddClick()}>Add</button>
+      </div>
     </div>
   )
 }
